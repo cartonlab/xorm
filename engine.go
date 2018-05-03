@@ -1550,8 +1550,12 @@ func (engine *Engine) formatColTime(col *core.Column, t time.Time) (v interface{
 func (engine *Engine) formatTime(sqlTypeName string, t time.Time) (v interface{}) {
 	switch sqlTypeName {
 	case core.Time:
-		s := t.Format("2006-01-02 15:04:05") //time.RFC3339
-		v = s[11:19]
+		if engine.dialect.DBType() == core.POSTGRES {
+			v = t.Format(time.RFC3339Nano)
+		} else {
+			s := t.Format("2006-01-02 15:04:05") //time.RFC3339
+			v = s[11:19]
+		}
 	case core.Date:
 		v = t.Format("2006-01-02")
 	case core.DateTime, core.TimeStamp:
